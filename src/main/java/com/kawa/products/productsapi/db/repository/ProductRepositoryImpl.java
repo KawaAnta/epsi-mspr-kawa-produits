@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Implémentation du repository de la couche domaine.
@@ -21,6 +22,7 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     private final ProductDbRepository dbRepository;
     private final ProductMapper mapper;
+    static Logger logger = Logger.getLogger(ProductRepositoryImpl.class.getName());
 
     @Override
     @Transactional
@@ -37,11 +39,20 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
     public void deleteById(Long id) {
-        dbRepository.deleteById(id);
+        try {
+            dbRepository.deleteById(id);
+        } catch (Exception e) {
+            logger.warning(e.getMessage());
+        }
     }
 
     @Override
     public Product save(Product product) {
-        return mapper.mapToDomain(dbRepository.save(mapper.mapFromDomain(product)));
+        try {
+            return mapper.mapToDomain(dbRepository.save(mapper.mapFromDomain(product)));
+        } catch (Exception e) {
+            logger.warning(e.getMessage());
+        }
+        return null;
     }
 }
