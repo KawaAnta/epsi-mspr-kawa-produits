@@ -1,13 +1,13 @@
-package com.kawa.clients.clientsapi;
+package com.kawa.products.productsapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ClientsApiApplication {
+public class ProductsApiApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ClientsApiApplication.class, args);
+		SpringApplication.run(ProductsApiApplication.class, args);
 	}
 
 }
