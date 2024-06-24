@@ -41,8 +41,8 @@ public class ProductRepositoryImpl implements ProductRepository {
     public void deleteById(Long id) {
         try {
             dbRepository.deleteById(id);
-        } catch (Exception e) {
-            logger.warning(e.getMessage());
+        } catch (Exception exception) {
+            logger.warning(exception.getMessage());
         }
     }
 
@@ -50,8 +50,8 @@ public class ProductRepositoryImpl implements ProductRepository {
     public Product save(Product product) {
         try {
             return mapper.mapToDomain(dbRepository.save(mapper.mapFromDomain(product)));
-        } catch (Exception e) {
-            logger.warning(e.getMessage());
+        } catch (Exception exception) {
+            logger.warning(exception.getMessage());
         }
         return null;
     }
