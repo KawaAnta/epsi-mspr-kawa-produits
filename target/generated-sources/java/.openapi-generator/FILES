@@ -1,5 +1,0 @@
-src/main/java/com/kawa/products/generated/api/model/ProductDto.java
-src/main/java/com/kawa/products/generated/api/server/ApiUtil.java
-src/main/java/com/kawa/products/generated/api/server/ProductsApi.java
-src/main/java/com/kawa/products/generated/api/server/ProductsApiController.java
-src/main/java/com/kawa/products/generated/api/server/ProductsApiDelegate.java

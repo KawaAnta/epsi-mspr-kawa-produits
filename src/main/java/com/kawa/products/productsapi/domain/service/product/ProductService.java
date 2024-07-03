@@ -1,6 +1,7 @@
 package com.kawa.products.productsapi.domain.service.product;
 
 import com.kawa.products.productsapi.domain.service.product.dto.Product;
+import com.kawa.products.productsapi.dto.OrderMessageDTO;
 
 import java.util.List;
 
@@ -33,5 +34,11 @@ public interface ProductService {
      * @param product produit.
      */
     Product save(Product product);
+
+    /**
+     * Réduit le stock des produits cités dans des commandes.
+     * @param orderMessageDTO objet des produits.
+     */
+    void reduceStock(OrderMessageDTO orderMessageDTO);
 
 }

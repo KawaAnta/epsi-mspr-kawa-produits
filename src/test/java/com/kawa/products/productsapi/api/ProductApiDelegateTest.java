@@ -35,7 +35,7 @@ class ProductApiDelegateTest {
 
     @Test
     void testGetAllProducts() {
-        // Setup
+        // GIVEN
         final ProductDto productDto = new ProductDto();
         productDto.setName("name");
         productDto.setPrice("price");
@@ -45,7 +45,6 @@ class ProductApiDelegateTest {
         final ResponseEntity<List<ProductDto>> expectedResult = new ResponseEntity<>(List.of(productDto),
                 HttpStatus.OK);
 
-        // Configure ProductService.getAll(...).
         final List<Product> products = List.of(Product.builder()
                 .id(0L)
                 .name("name")
@@ -57,10 +56,10 @@ class ProductApiDelegateTest {
                 .build());
         when(mockProductService.getAll()).thenReturn(products);
 
-        // Run the test
+        // WHEN
         final ResponseEntity<List<ProductDto>> result = productApiDelegateUnderTest.getAllProducts();
 
-        // Verify the results
+        // THEN
         assertThat(result).isEqualTo(expectedResult);
     }
 
