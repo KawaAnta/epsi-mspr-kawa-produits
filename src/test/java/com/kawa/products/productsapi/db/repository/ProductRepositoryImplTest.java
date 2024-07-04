@@ -151,6 +151,7 @@ class ProductRepositoryImplTest {
         when(mockMapper.mapFromDomain(product)).thenReturn(productDb);
         when(mockDbRepository.save(productDb)).thenThrow(new RuntimeException("Error"));
 
+
         // WHEN
         final Product result = productRepositoryImplUnderTest.save(product);
 

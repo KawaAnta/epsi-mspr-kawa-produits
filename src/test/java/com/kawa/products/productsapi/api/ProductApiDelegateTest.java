@@ -42,7 +42,7 @@ class ProductApiDelegateTest {
         productDto.setColor("color");
         productDto.setStock(0L);
         final ResponseEntity<List<ProductDto>> expectedResult = new ResponseEntity<>(List.of(productDto), HttpStatus.OK);
-
+      
         final List<Product> products = List.of(Product.builder()
                 .id(0L)
                 .name("name")
