@@ -17,8 +17,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductApiDelegateTest {
@@ -42,9 +41,8 @@ class ProductApiDelegateTest {
         productDto.setDescription("description");
         productDto.setColor("color");
         productDto.setStock(0L);
-        final ResponseEntity<List<ProductDto>> expectedResult = new ResponseEntity<>(List.of(productDto),
-                HttpStatus.OK);
-
+        final ResponseEntity<List<ProductDto>> expectedResult = new ResponseEntity<>(List.of(productDto), HttpStatus.OK);
+      
         final List<Product> products = List.of(Product.builder()
                 .id(0L)
                 .name("name")
@@ -73,6 +71,18 @@ class ProductApiDelegateTest {
 
         // THEN
         assertThat(result).isEqualTo(ResponseEntity.ok(Collections.emptyList()));
+    }
+
+    @Test
+    void testGetAllProducts_Exception() {
+        // GIVEN
+        when(mockProductService.getAll()).thenThrow(new RuntimeException("Error"));
+
+        // WHEN
+        final ResponseEntity<List<ProductDto>> result = productApiDelegateUnderTest.getAllProducts();
+
+        // THEN
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -105,6 +115,30 @@ class ProductApiDelegateTest {
     }
 
     @Test
+    void testGetProductById_NotFound() {
+        // GIVEN
+        when(mockProductService.getById(0L)).thenReturn(null);
+
+        // WHEN
+        final ResponseEntity<ProductDto> result = productApiDelegateUnderTest.getProductById(0L);
+
+        // THEN
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void testGetProductById_Exception() {
+        // GIVEN
+        when(mockProductService.getById(0L)).thenThrow(new RuntimeException("Error"));
+
+        // WHEN
+        final ResponseEntity<ProductDto> result = productApiDelegateUnderTest.getProductById(0L);
+
+        // THEN
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
     void testDeleteProductById() {
         // GIVEN
         final Product product = Product.builder()
@@ -124,6 +158,30 @@ class ProductApiDelegateTest {
         // THEN
         verify(mockProductService).deleteById(0L);
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    void testDeleteProductById_NotFound() {
+        // GIVEN
+        when(mockProductService.getById(0L)).thenReturn(null);
+
+        // WHEN
+        final ResponseEntity<Void> result = productApiDelegateUnderTest.deleteProductById(0L);
+
+        // THEN
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void testDeleteProductById_Exception() {
+        // GIVEN
+        when(mockProductService.getById(0L)).thenThrow(new RuntimeException("Error"));
+
+        // WHEN
+        final ResponseEntity<Void> result = productApiDelegateUnderTest.deleteProductById(0L);
+
+        // THEN
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -147,6 +205,21 @@ class ProductApiDelegateTest {
 
         // THEN
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(result.getBody()).isEqualTo("0");
+    }
+
+    @Test
+    void testCreateProduct_Exception() {
+        // GIVEN
+        final ProductDto productDto = new ProductDto("name", "price", "description", "color", 0L);
+        when(mockProductService.save(any(Product.class))).thenThrow(new RuntimeException("Error"));
+
+        // WHEN
+        final ResponseEntity<String> result = productApiDelegateUnderTest.createProduct(productDto);
+
+        // THEN
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(result.getBody()).isEqualTo("Erreur inattendue.");
     }
 
     @Test
@@ -207,5 +280,30 @@ class ProductApiDelegateTest {
 
         // THEN
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void testUpdateProduct_Exception() {
+        // GIVEN
+        final ProductDto productDto = new ProductDto("name", "price", "description", "color", 0L);
+
+        final Product product = Product.builder()
+                .id(0L)
+                .name("name")
+                .price("price")
+                .description("description")
+                .color("color")
+                .createdAt(LocalDateTime.of(2020, 1, 1, 0, 0, 0))
+                .stock(0L)
+                .build();
+        when(mockProductService.getById(0L)).thenReturn(product);
+
+        when(mockProductService.getAll()).thenThrow(new RuntimeException("Error"));
+
+        // WHEN
+        final ResponseEntity<Void> result = productApiDelegateUnderTest.updateProduct(0L, productDto);
+
+        // THEN
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
