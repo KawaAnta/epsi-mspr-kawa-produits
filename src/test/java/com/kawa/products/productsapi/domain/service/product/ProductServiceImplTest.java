@@ -2,6 +2,7 @@ package com.kawa.products.productsapi.domain.service.product;
 
 import com.kawa.products.productsapi.domain.ports.ProductRepository;
 import com.kawa.products.productsapi.domain.service.product.dto.Product;
+import com.kawa.products.productsapi.dto.OrderMessageDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,9 +14,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceImplTest {
@@ -90,5 +91,48 @@ class ProductServiceImplTest {
 
         // THEN
         assertThat(result).isEqualTo(product);
+    }
+
+    @Test
+    void testReduceStock_SufficientStock() {
+        // GIVEN
+        Product product = new Product();
+        product.setId(1L);
+        product.setStock(10L);
+
+        OrderMessageDTO orderMessageDTO = new OrderMessageDTO();
+        orderMessageDTO.setProductIds(List.of(1L));
+
+        when(mockProductRepository.getById(1L)).thenReturn(product);
+        when(mockProductRepository.save(any(Product.class))).thenReturn(product);
+
+        // WHEN
+        productServiceImplUnderTest.reduceStock(orderMessageDTO);
+
+        // THEN
+        verify(mockProductRepository).getById(1L);
+        verify(mockProductRepository).save(product);
+        assertThat(product.getStock()).isEqualTo(9);
+    }
+
+    @Test
+    void testReduceStock_InsufficientStock() {
+        // GIVEN
+        Product product = new Product();
+        product.setId(1L);
+        product.setStock(0L);
+
+        OrderMessageDTO orderMessageDTO = new OrderMessageDTO();
+        orderMessageDTO.setProductIds(List.of(1L));
+
+        when(mockProductRepository.getById(1L)).thenReturn(product);
+
+        // WHEN / THEN
+        assertThatThrownBy(() -> productServiceImplUnderTest.reduceStock(orderMessageDTO))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Rupture de stock.");
+
+        verify(mockProductRepository).getById(1L);
+        verify(mockProductRepository, never()).save(any(Product.class));
     }
 }

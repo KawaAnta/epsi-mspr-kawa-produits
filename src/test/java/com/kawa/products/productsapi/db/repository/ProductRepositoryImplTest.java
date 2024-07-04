@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -111,24 +112,49 @@ class ProductRepositoryImplTest {
     }
 
     @Test
+    void testDeleteById_Exception() {
+        // GIVEN
+        doThrow(new RuntimeException("Error")).when(mockDbRepository).deleteById(0L);
+
+        // WHEN
+        productRepositoryImplUnderTest.deleteById(0L);
+
+        // THEN
+        verify(mockDbRepository).deleteById(0L);
+    }
+
+    @Test
     void testSave() {
         // GIVEN
+        final Product product = Product.builder().id(0L).build();
         final ProductDb productDb = new ProductDb();
         productDb.setId(0L);
-        productDb.setName("name");
-        productDb.setPrice("price");
-        productDb.setDescription("description");
-        productDb.setColor("color");
-        lenient().when(mockMapper.mapFromDomain(any(Product.class))).thenReturn(productDb);
 
-        Product product = mockMapper.mapToDomain(productDb);
-
-        lenient().when(mockMapper.mapToDomain(any(ProductDb.class))).thenReturn(product);
+        when(mockMapper.mapFromDomain(product)).thenReturn(productDb);
+        when(mockDbRepository.save(productDb)).thenReturn(productDb);
+        when(mockMapper.mapToDomain(productDb)).thenReturn(product);
 
         // WHEN
         final Product result = productRepositoryImplUnderTest.save(product);
 
         // THEN
         assertThat(result).isEqualTo(product);
+    }
+
+    @Test
+    void testSave_Exception() {
+        // GIVEN
+        final Product product = Product.builder().id(0L).build();
+        final ProductDb productDb = new ProductDb();
+        productDb.setId(0L);
+
+        when(mockMapper.mapFromDomain(product)).thenReturn(productDb);
+        when(mockDbRepository.save(productDb)).thenThrow(new RuntimeException("Error"));
+
+        // WHEN
+        final Product result = productRepositoryImplUnderTest.save(product);
+
+        // THEN
+        assertThat(result).isNull();
     }
 }
