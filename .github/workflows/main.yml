@@ -37,7 +37,7 @@ jobs:
         java-version: 17
         distribution: 'adopt'
 
-    - name: Build and test with Maven
+    - name: Build and test with clean Maven
       run: mvn clean verify jacoco:report
 
     - name: Upload coverage report artifact
